@@ -1,0 +1,68 @@
+<div class="main-component__wrapper">
+    <div class="main-component__mobile">
+        <ng-container *ngIf="!_isPreviewOfLevel">
+            <div class="main-component__mobile-header">Уровень {{ _currentLevel }}</div>
+            <div class="main-component__mobile-field">
+                <div *ngFor="let row of _sortedWords" class="main-component__mobile-field-row">
+                    <div
+                        *ngFor="let letter of row.word"
+                        class="main-component__mobile-field-row-letter"
+                        [style.background-color]="row.guessed ? '#65BD65' : '#F2F2F2'"
+                    >
+                        {{ row.guessed ? letter : '' }}
+                    </div>
+                </div>
+            </div>
+            <div class="main-component__mobile-word">
+                <div *ngFor="let letter of _enteringWord" class="main-component__mobile-word-letter">{{ letter.value }}</div>
+            </div>
+            <div class="main-component__mobile-select">
+                <div
+                    *ngFor="let item of _lettersWithLayout"
+                    class="main-component__mobile-select-letter"
+                    [id]="item.letter.id"
+                    (mousedown)="_onLetterClick(item.letter)"
+                    (mouseenter)="_onLetterHover(item.letter)"
+                    (touchstart)="_onLetterClick(item.letter)"
+                    (touchmove)="_onTouchMove($event)"
+                    [style.top]="item.coordinates.y"
+                    [style.left]="item.coordinates.x"
+                    [style.background-color]="_enteringWord.includes(item.letter) ? '#E96FA4' : '#FFFFFF'"
+                    [style.color]="_enteringWord.includes(item.letter) ? '#FFFFFF' : '#4D4D4D'"
+                    [style.box-shadow]="_enteringWord.includes(item.letter) ? '0 4px 0 0 #AF638C' : '0 4px 0 0 #A6A8AB'"
+                >
+                    {{ item.letter.value }}
+                </div>
+                <div class="main-component__mobile-select-inner-circle"></div>
+                <div class="main-component__mobile-select-outer-circle"></div>
+                <div class="main-component__mobile-levelComplete-button" (click)="_startNewLevel()">
+                    Level {{ _currentLevel + 1 }}
+                </div>
+<!--                <div (click)="_startNewLevel()">-->
+<!--                    Level {{ _currentLevel + 1 }}-->
+<!--                </div>-->
+            <!--            <div-->
+            <!--                *ngFor="let letter of availableLettersInHTML"-->
+            <!--                class="main-component__mobile-select-letter"-->
+            <!--                (mousedown)="_onLetterClick(letter)"-->
+            <!--                (mouseenter)="_onLetterHover(letter)"-->
+            <!--                (touchstart)="_onLetterClick(letter)"-->
+            <!--                (touchmove)="_onTouchMove($event)"-->
+            <!--            >-->
+            <!--                {{ letter.letter }}-->
+            <!--            </div>-->
+            </div>
+        </ng-container>
+        <ng-container *ngIf="_isPreviewOfLevel">
+            <div class="main-component__mobile-levelComplete-complete">
+                Уровень {{ _currentLevel }} пройден
+            </div>
+            <div class="main-component__mobile-levelComplete-amazing">
+                Изумительно!
+            </div>
+            <div class="main-component__mobile-levelComplete-button" (click)="_startNewLevel()">
+                Level {{ _currentLevel + 1 }}
+            </div>
+        </ng-container>
+    </div>
+</div>
