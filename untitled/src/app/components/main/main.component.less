@@ -171,7 +171,6 @@
         &-levelComplete {
             &-complete {
                 color: #ffffff;
-                margin-top: 150px;
                 font-family: VAG World;
                 font-size: 23px;
                 font-weight: 700;
@@ -201,5 +200,88 @@
                 cursor: pointer;
             }
         }
+
+        &-popup {
+            &-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                max-width: 500px;
+                height: 100%;
+                background-color: #000000B2;
+                position: absolute;
+                z-index: 3;
+            }
+
+            &-content {
+                background-color: #ffffff;
+                z-index: 4;
+                border-radius: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                position: relative;
+                margin: 0 40px;
+                padding: 20px;
+
+                &-header {
+                    position: absolute;
+                    top: -35px;
+                    font-family: VAG World;
+                    font-size: 22px;
+                    font-weight: 700;
+                    color: #ffffff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-direction: column;
+
+                    svg {
+                        max-width: 220px;
+                    }
+
+                    span:nth-child(2) {
+                        position: absolute;
+                        top: 26px;
+                    }
+
+                    span:nth-child(3) {
+                        position: absolute;
+                        top: 50px;
+                    }
+                }
+
+                &-text {
+                    font-family: VAG World;
+                    font-size: 24px;
+                    font-weight: 700;
+                    line-height: 28px;
+                    text-align: center;
+                    padding: 0 10px;
+                    margin: 45px 0 26px;
+                    color: #4D4D4D;
+                }
+
+                &-button {
+                    font-family: VAG World;
+                    font-size: 27px;
+                    font-weight: 700;
+                    line-height: 38.6px;
+                    text-align: center;
+
+                    padding: 9px 33px;
+                    border-radius: 31px;
+
+                    color: #ffffff;
+                    background-color: #65BD65;
+
+                    box-shadow: 0 6px 0 0 #508853;
+                    cursor: pointer;
+                }
+            }
+        }
+
     }
 }

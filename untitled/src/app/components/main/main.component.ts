@@ -58,6 +58,39 @@ export class MainComponent implements OnInit {
         }
     }
 
+    @HostListener('document:visibilitychange', ['$event'])
+    appVisibility() {
+        if (document.hidden) {
+            console.log("Hidden: ");
+            this._setTimeOnExitFromTab();
+        } else {
+            this._checkIsThisTabLastPlayed();
+            // if (this.getItem('applicationCount') > 1) {
+            //     this._showPopupSeveralTabs();
+            // }
+            console.log("SHOWN: ");
+        }
+    }
+
+    // @HostListener('window:load')
+    // onLoad() {
+    //     let applicationCount: number = this.getItemFromLocalStorage('applicationCount');
+    //     if (applicationCount) {
+    //         localStorage.setItem('applicationCount', JSON.stringify(++applicationCount));
+    //     } else {
+    //         localStorage.setItem('applicationCount', '1');
+    //     }
+    // }
+
+    // @HostListener('window:unload')
+    // onUnload() {
+    //     // TODO unload is deprecated. Find smth else
+    //     let applicationCount: number = this.getItemFromLocalStorage('applicationCount');
+    //     if (applicationCount) {
+    //         localStorage.setItem('applicationCount', JSON.stringify(--applicationCount));
+    //     }
+    // }
+
     public _initWords: Array<string> = [];
     public _initWords1: Array<string> = ["брат","араб","тара","бар","раб","бра"];
     public _initWords2: Array<string> = ["минор","корм","кино","мир","ком","ион","ром","мор","рок","инок"];
@@ -77,6 +110,8 @@ export class MainComponent implements OnInit {
     public _isPreviewOfLevel: boolean = false;
     public _currentLevel: number = 1;
 
+    public _isPopupSeveralTabsVisible: boolean = false;
+
     private _indexNumberForAvailableLettersInHTML: number = 0;
 
     private rects: Array<RectWithLetterLayout>;
@@ -93,13 +128,33 @@ export class MainComponent implements OnInit {
         this._getCoordinatesOfAvailableLetters();
     }
 
+    _setTimeOnExitFromTab(): void {
+        localStorage.setItem('lastPlayedTime', JSON.stringify(Date.now()));
+        sessionStorage.setItem('lastPlayedTime', JSON.stringify(Date.now()));
+    }
+
+    _checkIsThisTabLastPlayed(): void {
+        if (this.getItemFromLocalStorage('lastPlayedTime') !== this.getItemFromSessionStorage('lastPlayedTime')) {
+            this._showPopupSeveralTabs();
+        }
+    }
+
+    _showPopupSeveralTabs(): void {
+        this._isPopupSeveralTabsVisible = true;
+    }
+
+    _reloadPage(): void {
+        this._isPopupSeveralTabsVisible = false;
+        window.location.reload();
+    }
+
     _getCoordinatesOfAvailableLetters(): void {
         // console.log(this.myElement?.nativeElement?.value);
         this.rects = [];
         this._lettersWithLayout.forEach((letterWithLayout, index) => {
-            let element: HTMLElement = document.getElementById(index.toString())!;
+            let element: HTMLElement = document?.getElementById(index.toString())!;
             this.rects.push({
-                rect: element.getBoundingClientRect(),
+                rect: element?.getBoundingClientRect(),
                 letterWithLayout,
             });
         });
@@ -122,13 +177,17 @@ export class MainComponent implements OnInit {
         this._calcCoordinates();
     }
 
-    public getItem(key: string): any {
+    public getItemFromLocalStorage(key: string): any {
         return JSON.parse(localStorage.getItem(key)!);
     }
 
+    public getItemFromSessionStorage(key: string): any {
+        return JSON.parse(sessionStorage.getItem(key)!);
+    }
+
     _checkStateOfGame(): void {
-        const currentLevel: string = this.getItem('currentLevel');
-        const sortedWords: string = this.getItem('words');
+        const currentLevel: string = this.getItemFromLocalStorage('currentLevel');
+        const sortedWords: string = this.getItemFromLocalStorage('words');
         if (currentLevel) {
             this._currentLevel = +currentLevel;
         }
@@ -157,9 +216,10 @@ export class MainComponent implements OnInit {
 
     _sortWords(): void {
         // TODO check State of game in suitable function
-        const sortedWords: any = this.getItem('words');
+        const sortedWords: any = this.getItemFromLocalStorage('words');
         if (sortedWords) {
             this._sortedWords = sortedWords;
+            this._checkIfAllTheWordsGuessed();
             return;
         }
 
@@ -480,33 +540,34 @@ export class MainComponent implements OnInit {
         let enteringWord: Array<string> = [];
         this._enteringWord.forEach((letter: AvailableLetter) => {
             enteringWord.push(letter.value);
-        })
+        });
 
         this._initWords.forEach((word: string) => {
-           if (word === enteringWord.join('')) {
+            if (word === enteringWord.join('')) {
                 const index: number = this._sortedWords.findIndex(obj => obj.word?.join('') === word);
                 this._sortedWords[index].guessed = true;
 
                 this._saveProgress();
-
-                let isSomeWordStillNotGuessed: boolean = false;
-                this._sortedWords.forEach((word) => {
-                    if (word.guessed === false) {
-                        isSomeWordStillNotGuessed = true;
-                        return;
-                    }
-                });
-
-                if (!isSomeWordStillNotGuessed) {
-                    this._isPreviewOfLevel = true;
-                }
-
-           }
+                this._checkIfAllTheWordsGuessed();
+            }
         });
 
         this._enteringWord = [];
         this._isWordEnteringNow = false;
+    }
 
+    _checkIfAllTheWordsGuessed(): void {
+        let isSomeWordStillNotGuessed: boolean = false;
+        this._sortedWords.forEach((word) => {
+            if (word.guessed === false) {
+                isSomeWordStillNotGuessed = true;
+                return;
+            }
+        });
+
+        if (!isSomeWordStillNotGuessed) {
+            this._isPreviewOfLevel = true;
+        }
     }
 
     _saveProgress(): void {
